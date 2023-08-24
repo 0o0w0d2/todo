@@ -50,24 +50,36 @@
       </div>
     </nav>
 
-    <form>
-      <div class="form-group">
-        <label for="exampleInputTodo">To do</label>
-        <input class="form-control" id="todoinput" aria-describedby="todo" />
-        <small id="todoHelp" class="form-text text-muted"
-          >할 일을 적어주세요!</small
-        >
-      </div>
-      <div class="form-group">
-        <label for="exampleInputDate">Due date</label>
-        <input class="form-control" id="duedateinput" />
-      </div>
-      <div class="form-group form-check">
-        <input type="checkbox" class="form-check-input" id="importantcheck" />
-        <label class="form-check-label" for="exampleCheck1">중요</label>
-      </div>
-      <button type="submit" class="btn btn-info">Submit</button>
-    </form>
+    <div class="container mt-4 ml-4">
+      <form action="/add" method="POST">
+        <div class="form-group">
+          <label for="exampleInputTodo">To do</label>
+          <input
+            class="form-control"
+            id="todoinput"
+            name="todo"
+            aria-describedby="todo"
+          />
+          <small id="todoHelp" class="form-text text-muted"
+            >할 일을 적어주세요!</small
+          >
+        </div>
+        <div class="form-group">
+          <label for="exampleInputDate">Due date</label>
+          <input class="form-control" id="duedateinput" name="date" />
+        </div>
+        <div class="form-group form-check">
+          <input
+            type="checkbox"
+            class="form-check-input"
+            id="importantcheck"
+            name="important"
+          />
+          <label class="form-check-label" for="exampleCheck1">중요</label>
+        </div>
+        <button type="submit" class="btn btn-info">Submit</button>
+      </form>
+    </div>
 
     <script
       src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"
