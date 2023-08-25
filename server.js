@@ -15,12 +15,12 @@ app.get("/", (req, res) => {
   res.sendFile(__dirname + "/index.html");
 });
 
-app.get("/write", (req, res) => {
+app.get("/write-todo", (req, res) => {
   res.sendFile(__dirname + "/write.html");
 });
 
-app.post("/add", (req, res) => {
-  res.send("전송 완료!");
+app.post("/write-todo", (req, res) => {
+  console.log("작성 완료!");
   console.log(req.body.todo);
   console.log(req.body.date);
   if (!req.body.important) {
@@ -28,4 +28,6 @@ app.post("/add", (req, res) => {
   } else {
     console.log("중요!");
   }
+  // 작성된 이후에 할 일 목록창으로 연결시켜주기?
+  // res.sendFile(__dirname + '/list.html')
 });
