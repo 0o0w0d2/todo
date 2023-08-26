@@ -1,15 +1,31 @@
 const express = require("express");
 const app = express();
 const dotenv = require("dotenv");
-
+dotenv.config();
+const MongoClient = require("mongodb").MongoClient;
 app.use(express.urlencoded({ extended: true }));
 
-dotenv.config();
-
 const port = process.env.PORT;
-app.listen(port, () => {
-  console.log(`listening on ${port}!`);
-});
+const mongo_uri = process.env.MONGO_URI;
+
+MongoClient.connect(mongo_uri)
+  .then((client) => {
+    console.log("Connected to MongoDB");
+
+    const db = client.db("todo");
+
+    db.collection("post").insertOne({
+      todo: "안녕",
+      date: "2020-03-02",
+    });
+
+    app.listen(port, () => {
+      console.log(`listening on ${port}`);
+    });
+  })
+  .catch((err) => {
+    console.log(err);
+  });
 
 app.get("/", (req, res) => {
   res.sendFile(__dirname + "/index.html");
