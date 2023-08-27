@@ -50,12 +50,15 @@
       </div>
     </nav>
 
+    <!-- 만약 이 todo가 중요!일 경우 todo 색을 다른색으로? -->
     <div class="container mt-4 ml-4">
       <h3>To do List</h3>
+      <% for (let i = 0; i < posts.length; i++) { %>
       <div>
-        <h4>To do :</h4>
-        <p>Date :</p>
+        <h4>To do : <%= posts[i].todo %></h4>
+        <p>Date : <%= posts[i].date %></p>
       </div>
+      <% } %>
     </div>
 
     <script

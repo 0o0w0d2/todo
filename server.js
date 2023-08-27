@@ -54,7 +54,8 @@ app.get("/list", async (req, res) => {
   let result;
   try {
     result = await db.collection("post").find().toArray();
-    res.json(result);
+    console.log(result);
+    res.render("list.ejs", { posts: result });
   } catch (err) {
     console.error(err);
   }
