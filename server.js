@@ -4,12 +4,14 @@ const dotenv = require("dotenv");
 dotenv.config();
 const MongoClient = require("mongodb").MongoClient;
 app.use(express.urlencoded({ extended: true }));
+app.set("view engine", "ejs");
 
 const port = process.env.PORT;
 const mongo_uri = process.env.MONGO_URI;
 
 var db;
 
+// 이 코드를 async/await 과 try - catch 문을 이용하는 방법에 대해서는 좀 더 생각해봐야겠다...
 MongoClient.connect(mongo_uri)
   .then((client) => {
     app.listen(port, () => {
@@ -25,27 +27,37 @@ MongoClient.connect(mongo_uri)
   });
 
 app.get("/", (req, res) => {
-  res.sendFile(__dirname + "/index.html");
+  res.render("index.ejs");
 });
 
 app.get("/write-todo", (req, res) => {
-  res.sendFile(__dirname + "/write.html");
+  res.render("write.ejs");
 });
 
-// insertOne의 callback을 이용하면 console message가 제대로 출력되지 않는 현상으로 인해 try-catch문으로 바꿈
-// insertOne의 callback이 제대로 작동하지 않는 이유에 대해서 계속 알아봐야 할 듯
-app.post("/write-todo", (req, res) => {
+app.post("/write-todo", async (req, res) => {
   try {
-    db.collection("post").insertOne({
+    await db.collection("post").insertOne({
       todo: req.body.todo,
       date: req.body.date,
+      detail: req.body.detail,
       important: req.body.important ? "Y" : "N",
     });
-
-    console.log("저장 완료!");
   } catch (err) {
-    console.error("에러 발생:", err);
+    console.error(err);
   }
 
-  res.redirect("/");
+  console.log("Successfully saved");
+  res.redirect("/list");
+});
+
+app.get("/list", async (req, res) => {
+  let result;
+  try {
+    result = await db.collection("post").find().toArray();
+    res.json(result);
+  } catch (err) {
+    console.error(err);
+  }
+
+  console.log("List successfully loaded");
 });
