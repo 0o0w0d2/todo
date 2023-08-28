@@ -60,13 +60,13 @@
           method: "DELETE",
           url: `/post/${_id}`,
           data: { _id: _id },
-        })
-          .done(function (result) {
+          success: function (result) {
             deleteButton.parent("li").fadeOut();
-          })
-          .fail(function (xhr, textStatus, errorThrown) {
+          },
+          error: function (xhr, textStatus, errorThrown) {
             console.log(xhr, textStatus, errorThrown);
-          });
+          },
+        });
       });
     </script>
 

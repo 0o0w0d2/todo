@@ -83,13 +83,13 @@
             detail: $("#detailtextarea").val(),
             important: $("#importantcheck").prop("checked") ? "Y" : "N",
           },
-        })
-          .done(function (result) {
+          success: function (result) {
             window.location.href = "/list";
-          })
-          .fail(function (xhr, textStatus, errorThrown) {
+          },
+          error: function (xhr, textStatus, errorThrown) {
             console.log(xhr, textStatus, errorThrown);
-          });
+          },
+        });
       });
     </script>
 
