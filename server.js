@@ -36,12 +36,19 @@ app.get("/write-todo", (req, res) => {
 
 app.post("/write-todo", async (req, res) => {
   try {
+    total = await db
+      .collection("post-counter")
+      .findOne({ name: "게시물 갯수" });
     await db.collection("post").insertOne({
+      _id: total.totalPost + 1,
       todo: req.body.todo,
       date: req.body.date,
       detail: req.body.detail,
       important: req.body.important ? "Y" : "N",
     });
+    await db
+      .collection("post-counter")
+      .updateOne({ name: "게시물 갯수" }, { $inc: { totalPost: 1 } });
   } catch (err) {
     console.error(err);
   }
