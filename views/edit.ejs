@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
+      integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N"
+      crossorigin="anonymous"
+    />
+
+    <link rel="stylesheet" href="/public/main.css" />
+
+    <title>Hello, world!</title>
+  </head>
+  <body>
+    <%- include('nav.html') %>
+
+    <div class="container mt-4">
+      <form>
+        <div class="form-group">
+          <label for="exampleInputTodo">To do</label>
+          <input
+            class="form-control"
+            id="todoinput"
+            name="todo"
+            aria-describedby="todo"
+            value="<%= post.todo %>"
+          />
+          <small id="todoHelp" class="form-text text-muted"
+            >할 일을 적어주세요!</small
+          >
+        </div>
+        <div class="form-group">
+          <label for="dateinput">Due date</label>
+          <input
+            class="form-control"
+            id="duedateinput"
+            name="date"
+            value="<%= post.date %>"
+          />
+        </div>
+        <div class="form-group">
+          <label for="detail">detail</label>
+          <textarea class="form-control" id="detailtextarea" name="detail">
+<%= post.detail %>
+          </textarea>
+        </div>
+        <div class="form-group form-check">
+          <input type="checkbox" class="form-check-input" id="importantcheck"
+          name="important" <%= post.important === "Y" ? "checked" : "" %> />
+          <label class="form-check-label" for="exampleCheck1">중요</label>
+        </div>
+        <button
+          type="submit"
+          class="btn btn-info update"
+          data-id="<%= post._id %>"
+        >
+          Submit
+        </button>
+      </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
+
+    <script>
+      $(".update").click(function (e) {
+        e.preventDefault();
+
+        const _id = e.target.dataset.id;
+
+        $.ajax({
+          method: "PUT",
+          url: `/post/${_id}/edit`,
+          data: {
+            todo: $("#todoinput").val(),
+            date: $("#duedateinput").val(),
+            detail: $("#detailtextarea").val(),
+            important: $("#importantcheck").prop("checked") ? "Y" : "N",
+          },
+        })
+          .done(function (result) {})
+          .fail(function (xhr, textStatus, errorThrown) {
+            console.log(xhr, textStatus, errorThrown);
+          });
+      });
+    </script>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+      integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js"
+      integrity="sha384-+sLIOodYLS7CIrQpBjl+C7nPvqq+FbNUBDunl/OZv93DB7Ln/533i8e/mZXLi/P+"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>

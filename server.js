@@ -97,3 +97,39 @@ app.get("/post/:id", async (req, res) => {
 
   console.log(`post ${id} successfully loaded`);
 });
+
+app.get("/post/:id/edit", async (req, res) => {
+  const id = parseInt(req.params.id);
+
+  try {
+    const post = await db.collection("post").findOne({ _id: id });
+
+    res.render("edit.ejs", { post: post });
+  } catch (err) {
+    console.error(err);
+  }
+});
+
+app.put("/post/:id/edit", async (req, res) => {
+  const id = parseInt(req.params.id);
+  console.log("이거임", req.body);
+  try {
+    await db.collection("post").updateOne(
+      { _id: id },
+      {
+        $set: {
+          todo: req.body.todo,
+          date: req.body.date,
+          detail: req.body.detail,
+          important: req.body.important ? "Y" : "N",
+        },
+      }
+    );
+  } catch (err) {
+    console.error(err);
+  }
+
+  console.log("Successfully updated");
+  res.status(200);
+  res.redirect("/list");
+});
