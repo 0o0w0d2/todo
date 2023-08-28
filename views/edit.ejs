@@ -57,7 +57,7 @@
           <label class="form-check-label" for="exampleCheck1">중요</label>
         </div>
         <button
-          type="submit"
+          type="button"
           class="btn btn-info update"
           data-id="<%= post._id %>"
         >
@@ -76,7 +76,7 @@
 
         $.ajax({
           method: "PUT",
-          url: `/post/${_id}/edit`,
+          url: `/post/${_id}`,
           data: {
             todo: $("#todoinput").val(),
             date: $("#duedateinput").val(),
@@ -84,7 +84,7 @@
             important: $("#importantcheck").prop("checked") ? "Y" : "N",
           },
           success: function (result) {
-            window.location.href = "/list";
+            window.location.href = `/post/${_id}`;
           },
           error: function (xhr, textStatus, errorThrown) {
             console.log(xhr, textStatus, errorThrown);

@@ -71,6 +71,19 @@ app.get("/list", async (req, res) => {
   console.log("List successfully loaded");
 });
 
+app.get("/post/:id", async (req, res) => {
+  const id = parseInt(req.params.id);
+
+  try {
+    const post = await db.collection("post").findOne({ _id: id });
+    res.render("detail.ejs", { post: post });
+  } catch (err) {
+    console.error(err);
+  }
+
+  console.log(`post ${id} successfully loaded`);
+});
+
 app.delete("/post/:id", async (req, res) => {
   const id = parseInt(req.body._id);
 
@@ -85,19 +98,6 @@ app.delete("/post/:id", async (req, res) => {
   res.status(200).send({ message: "Successfully deleted" });
 });
 
-app.get("/post/:id", async (req, res) => {
-  const id = parseInt(req.params.id);
-
-  try {
-    const post = await db.collection("post").findOne({ _id: id });
-    res.render("detail.ejs", { post: post });
-  } catch (err) {
-    console.error(err);
-  }
-
-  console.log(`post ${id} successfully loaded`);
-});
-
 app.get("/post/:id/edit", async (req, res) => {
   const id = parseInt(req.params.id);
 
@@ -110,11 +110,10 @@ app.get("/post/:id/edit", async (req, res) => {
   }
 });
 
-app.put("/post/:id/edit", async (req, res) => {
+app.put("/post/:id", async (req, res) => {
   const id = parseInt(req.params.id);
-  console.log("이거임", req.body);
   try {
-    await db.collection("post").updateOne(
+    const updatePost = await db.collection("post").updateOne(
       { _id: id },
       {
         $set: {
@@ -125,11 +124,9 @@ app.put("/post/:id/edit", async (req, res) => {
         },
       }
     );
+    res.status(200).send(updatePost);
   } catch (err) {
     console.error(err);
   }
-
   console.log("Successfully updated");
-  res.status(200);
-  res.redirect("/list");
 });
