@@ -38,7 +38,7 @@
             >
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#">Write</a>
+            <a class="nav-link" href="/write-todo">Write</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="#">List</a>
@@ -51,21 +51,46 @@
     </nav>
 
     <!-- 만약 이 todo가 중요!일 경우 todo 색을 다른색으로? -->
+    <!-- to do:를 누르면 상세 페이지로 가도록 설정?-->
     <div class="container mt-4 ml-4">
-      <h3>To do List</h3>
-      <% for (let i = 0; i < posts.length; i++) { %>
-      <div>
-        <h4>To do : <%= posts[i].todo %></h4>
-        <p>Date : <%= posts[i].date %></p>
-      </div>
-      <% } %>
+      <ul class="list-group">
+        <h2>To do List</h2>
+        <% for (let i = 0; i < posts.length; i++) { %>
+        <li class="list-group-item">
+          <h4>To do : <%= posts[i].todo %></h4>
+          <p>Date : <%= posts[i].date %></p>
+          <button type="submit" class="btn btn-info btn-sm">수정</button>
+          <button
+            type="submit"
+            class="btn btn-danger btn-sm delete"
+            data-id="<%= posts[i]._id %>"
+          >
+            삭제
+          </button>
+        </li>
+        <% } %>
+      </ul>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
 
-    <script
-      src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"
-      integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
-      crossorigin="anonymous"
-    ></script>
+    <script>
+      $(".delete").click(function (e) {
+        const _id = e.target.dataset.id;
+        const deleteButton = $(this);
+        $.ajax({
+          method: "DELETE",
+          url: `/post/${_id}`,
+          data: { _id: _id },
+        })
+          .done(function (result) {
+            deleteButton.parent("li").fadeOut();
+          })
+          .fail(function (xhr, textStatus, errorThrown) {
+            console.log(xhr, textStatus, errorThrown);
+          });
+      });
+    </script>
+
     <script
       src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
       integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"

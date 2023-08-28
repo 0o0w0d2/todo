@@ -54,6 +54,7 @@ app.post("/write-todo", async (req, res) => {
   }
 
   console.log("Successfully saved");
+  res.status(201);
   res.redirect("/list");
 });
 
@@ -61,11 +62,23 @@ app.get("/list", async (req, res) => {
   let result;
   try {
     result = await db.collection("post").find().toArray();
-    console.log(result);
     res.render("list.ejs", { posts: result });
   } catch (err) {
     console.error(err);
   }
 
   console.log("List successfully loaded");
+});
+
+app.delete("/post/:id", async (req, res) => {
+  try {
+    const id = parseInt(req.body._id);
+    await db.collection("post").deleteOne({ _id: id });
+  } catch (err) {
+    console.error(err);
+    res.status(500);
+  }
+
+  console.log("Successfully deleted");
+  res.status(200).send({ message: "Successfully deleted" });
 });
