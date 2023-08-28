@@ -71,8 +71,9 @@ app.get("/list", async (req, res) => {
 });
 
 app.delete("/post/:id", async (req, res) => {
+  const id = parseInt(req.body._id);
+
   try {
-    const id = parseInt(req.body._id);
     await db.collection("post").deleteOne({ _id: id });
   } catch (err) {
     console.error(err);
@@ -81,4 +82,17 @@ app.delete("/post/:id", async (req, res) => {
 
   console.log("Successfully deleted");
   res.status(200).send({ message: "Successfully deleted" });
+});
+
+app.get("/post/:id", async (req, res) => {
+  const id = parseInt(req.params.id);
+
+  try {
+    const post = await db.collection("post").findOne({ _id: id });
+    res.render("detail.ejs", { post: post });
+  } catch (err) {
+    console.error(err);
+  }
+
+  console.log(`post ${id} successfully loaded`);
 });
