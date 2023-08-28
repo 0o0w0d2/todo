@@ -84,7 +84,9 @@
             important: $("#importantcheck").prop("checked") ? "Y" : "N",
           },
         })
-          .done(function (result) {})
+          .done(function (result) {
+            window.location.href = "/list";
+          })
           .fail(function (xhr, textStatus, errorThrown) {
             console.log(xhr, textStatus, errorThrown);
           });
