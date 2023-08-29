@@ -1,3 +1,5 @@
+<!-- method-override library를 사용해 PUT 요청을 하게끔 작성함 -->
+
 <!DOCTYPE html>
 <html>
   <head>
@@ -22,7 +24,7 @@
     <%- include('nav.html') %>
 
     <div class="container mt-4">
-      <form>
+      <form action="/post/<%= post._id %>?_method=PUT" method="POST">
         <div class="form-group">
           <label for="exampleInputTodo">To do</label>
           <input
@@ -57,7 +59,7 @@
           <label class="form-check-label" for="exampleCheck1">중요</label>
         </div>
         <button
-          type="button"
+          type="submit"
           class="btn btn-info update"
           data-id="<%= post._id %>"
         >
@@ -67,31 +69,6 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
-
-    <script>
-      $(".update").click(function (e) {
-        e.preventDefault();
-
-        const _id = e.target.dataset.id;
-
-        $.ajax({
-          method: "PUT",
-          url: `/post/${_id}`,
-          data: {
-            todo: $("#todoinput").val(),
-            date: $("#duedateinput").val(),
-            detail: $("#detailtextarea").val(),
-            important: $("#importantcheck").prop("checked") ? "Y" : "N",
-          },
-          success: function (result) {
-            window.location.href = `/post/${_id}`;
-          },
-          error: function (xhr, textStatus, errorThrown) {
-            console.log(xhr, textStatus, errorThrown);
-          },
-        });
-      });
-    </script>
 
     <script
       src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"

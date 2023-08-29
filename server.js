@@ -6,6 +6,9 @@ const MongoClient = require("mongodb").MongoClient;
 app.use(express.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 app.use("/public", express.static("public"));
+// method-override 라이브러리 사용을 위한 모듈 불러오기
+const methodOverride = require("method-override");
+app.use(methodOverride("_method"));
 
 const port = process.env.PORT;
 const mongo_uri = process.env.MONGO_URI;
@@ -104,7 +107,7 @@ app.get("/post/:id/edit", async (req, res) => {
   try {
     const post = await db.collection("post").findOne({ _id: id });
 
-    res.status(200).render("edit.ejs", { post: post });
+    res.status(200).render("edit-methodoverride.ejs", { post: post });
   } catch (err) {
     console.error(err);
   }
@@ -113,7 +116,7 @@ app.get("/post/:id/edit", async (req, res) => {
 app.put("/post/:id", async (req, res) => {
   const id = parseInt(req.params.id);
   try {
-    const updatePost = await db.collection("post").updateOne(
+    await db.collection("post").updateOne(
       { _id: id },
       {
         $set: {
@@ -124,7 +127,11 @@ app.put("/post/:id", async (req, res) => {
         },
       }
     );
-    res.status(200).send({ message: "Successfully updated" });
+    res
+      .status(200)
+      // ajax 사용 시 .send({ message: "Successfully updated" })
+      // method-override 사용 시
+      .redirect(`/post/${id}`);
   } catch (err) {
     console.error(err);
   }
