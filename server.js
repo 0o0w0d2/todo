@@ -55,15 +55,14 @@ app.post("/write-todo", async (req, res) => {
   }
 
   console.log("Successfully saved");
-  res.status(201);
-  res.redirect("/list");
+  res.status(201).redirect("/list");
 });
 
 app.get("/list", async (req, res) => {
   let result;
   try {
     result = await db.collection("post").find().toArray();
-    res.render("list.ejs", { posts: result });
+    res.status(200).render("list.ejs", { posts: result });
   } catch (err) {
     console.error(err);
   }
@@ -76,7 +75,8 @@ app.get("/post/:id", async (req, res) => {
 
   try {
     const post = await db.collection("post").findOne({ _id: id });
-    res.render("detail.ejs", { post: post });
+
+    res.status(200).render("detail.ejs", { post: post });
   } catch (err) {
     console.error(err);
   }
@@ -104,7 +104,7 @@ app.get("/post/:id/edit", async (req, res) => {
   try {
     const post = await db.collection("post").findOne({ _id: id });
 
-    res.render("edit.ejs", { post: post });
+    res.status(200).render("edit.ejs", { post: post });
   } catch (err) {
     console.error(err);
   }
@@ -124,7 +124,7 @@ app.put("/post/:id", async (req, res) => {
         },
       }
     );
-    res.status(200).send(updatePost);
+    res.status(200).send({ message: "Successfully updated" });
   } catch (err) {
     console.error(err);
   }
