@@ -12,6 +12,7 @@ app.use(methodOverride("_method"));
 
 const port = process.env.PORT;
 const mongo_uri = process.env.MONGO_URI;
+const session_key = process.env.SESSION_KEY;
 
 var db;
 
@@ -136,4 +137,64 @@ app.put("/post/:id", async (req, res) => {
     console.error(err);
   }
   console.log("Successfully updated");
+});
+
+const passport = require("passport");
+const LocalStrategy = require("passport-local").Strategy;
+const session = require("express-session");
+
+app.use(
+  session({ secret: session_key, resave: true, saveUninitialized: false })
+);
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.get("/login", (req, res) => {
+  res.render("login.ejs");
+});
+
+app.post(
+  "/login",
+  passport.authenticate("local", {
+    failureRedirect: "/fail",
+  }),
+  (req, res) => {
+    res.redirect("/");
+  }
+);
+
+passport.use(
+  new LocalStrategy(
+    {
+      usernameField: "id",
+      passwordField: "pw",
+      session: true,
+      passReqToCallback: false,
+    },
+    async function (id, pw, done) {
+      try {
+        const result = await db.collection("login").findOne({ id: id });
+        if (!result) {
+          return done(null, false, { message: "The ID does not exist" });
+        }
+
+        if (pw === result.pw) {
+          return done(null, result);
+        } else {
+          return done(null, false, { message: "Password does not match" });
+        }
+      } catch (err) {
+        console.error(err);
+        return done(err);
+      }
+    }
+  )
+);
+
+passport.serializeUser(function (user, done) {
+  done(null, user.id);
+});
+
+passport.deserializeUser(function (아이디, done) {
+  done(null, {});
 });
