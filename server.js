@@ -173,7 +173,7 @@ passport.use(
     },
     async function (id, pw, done) {
       try {
-        const result = await db.collection("login").findOne({ id: id });
+        const result = await db.collection("member").findOne({ id: id });
         if (!result) {
           return done(null, false, { message: "The ID does not exist" });
         }
@@ -197,4 +197,21 @@ passport.serializeUser(function (user, done) {
 
 passport.deserializeUser(function (아이디, done) {
   done(null, {});
+});
+
+app.get("/register", (req, res) => {
+  res.render("register.ejs");
+});
+
+app.post("/register", async (req, res) => {
+  try {
+    await db.collection("member").insertOne({
+      id: req.body.id,
+      pw: req.body.pw,
+    });
+  } catch (err) {
+    console.error(err);
+  }
+
+  res.redirect("/");
 });
