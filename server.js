@@ -35,11 +35,127 @@ app.get("/", (req, res) => {
   res.render("index.ejs");
 });
 
-app.get("/write-todo", (req, res) => {
+const passport = require("passport");
+const LocalStrategy = require("passport-local").Strategy;
+const session = require("express-session");
+
+app.use(
+  session({ secret: session_key, resave: true, saveUninitialized: false })
+);
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.get("/login", (req, res) => {
+  res.render("login.ejs");
+});
+
+app.post(
+  "/login",
+  passport.authenticate("local", {
+    failureRedirect: "/fail",
+  }),
+  (req, res) => {
+    res.redirect("/");
+  }
+);
+
+passport.use(
+  new LocalStrategy(
+    {
+      usernameField: "id",
+      passwordField: "pw",
+      session: true,
+      passReqToCallback: false,
+    },
+    async function (id, pw, done) {
+      try {
+        const result = await db.collection("member").findOne({ id: id });
+        if (!result) {
+          return done(null, false, { message: "The ID does not exist" });
+        }
+
+        if (pw === result.pw) {
+          return done(null, result);
+          // 여기의 result가 serializeUser의 user로 들어 감
+        } else {
+          return done(null, false, { message: "Password does not match" });
+        }
+      } catch (err) {
+        console.error(err);
+        return done(err);
+      }
+    }
+  )
+);
+
+// id를 이용해서 세션을 저장시키는 코드 (로그인 성공 시 발동)
+passport.serializeUser(function (user, done) {
+  done(null, user.id);
+});
+
+// 이 세션 데이터를 가진 사람을 DB에서 찾아주세요 (마이페이지 접속 시 발동)
+passport.deserializeUser(async function (id, done) {
+  try {
+    const result = await db.collection("member").findOne({ id: id });
+
+    done(null, { result });
+  } catch (err) {
+    console.error(err);
+  }
+});
+
+app.get("/register", (req, res) => {
+  res.render("register.ejs");
+});
+
+app.post("/register", async (req, res) => {
+  // 아이디 중복 체크?
+  // 비밀번호 == 비밀번호 확인?
+  // 비밀번호 암호화해서 DB에 저장
+  try {
+    await db.collection("member").insertOne({
+      id: req.body.id,
+      pw: req.body.pw,
+    });
+  } catch (err) {
+    console.error(err);
+  }
+
+  res.redirect("/");
+});
+
+// 로그인 확인하는 미들웨어
+function loginCheck(req, res, next) {
+  if (req.user) {
+    next();
+  } else {
+    res.send({ message: "로그인한 사용자만 이용할 수 있습니다" });
+  }
+}
+
+app.get("/mypage", loginCheck, async (req, res) => {
+  // 세션이 있는지 검사
+  // 세션이 가진 id 정보를 이용해서 해당 유저가 쓴 todo 가져오기
+  // const id = req.user.id;
+
+  try {
+    const myPosts = await db.collection("post").find({ id: id }).toArray();
+    res.render("mypage.ejs", { post: myPosts });
+  } catch (err) {
+    console.error(err);
+  }
+});
+
+// /mypage는 req.user가 인식이 되는데 /write-todo 에서는 req.user가 인식이 안되는 이유가 뭘까..
+app.get("/write-todo", loginCheck, (req, res) => {
+  console.log(id);
+
   res.render("write.ejs");
 });
 
-app.post("/write-todo", async (req, res) => {
+app.post("/write-todo", loginCheck, async (req, res) => {
+  // const id = req.user.id;
+  // console.log(id);
   try {
     total = await db
       .collection("post-counter")
@@ -50,6 +166,7 @@ app.post("/write-todo", async (req, res) => {
       date: req.body.date,
       detail: req.body.detail,
       important: req.body.important ? "Y" : "N",
+      // id: req.user.id,
     });
     await db
       .collection("post-counter")
@@ -137,81 +254,4 @@ app.put("/post/:id", async (req, res) => {
     console.error(err);
   }
   console.log("Successfully updated");
-});
-
-const passport = require("passport");
-const LocalStrategy = require("passport-local").Strategy;
-const session = require("express-session");
-
-app.use(
-  session({ secret: session_key, resave: true, saveUninitialized: false })
-);
-app.use(passport.initialize());
-app.use(passport.session());
-
-app.get("/login", (req, res) => {
-  res.render("login.ejs");
-});
-
-app.post(
-  "/login",
-  passport.authenticate("local", {
-    failureRedirect: "/fail",
-  }),
-  (req, res) => {
-    res.redirect("/");
-  }
-);
-
-passport.use(
-  new LocalStrategy(
-    {
-      usernameField: "id",
-      passwordField: "pw",
-      session: true,
-      passReqToCallback: false,
-    },
-    async function (id, pw, done) {
-      try {
-        const result = await db.collection("member").findOne({ id: id });
-        if (!result) {
-          return done(null, false, { message: "The ID does not exist" });
-        }
-
-        if (pw === result.pw) {
-          return done(null, result);
-        } else {
-          return done(null, false, { message: "Password does not match" });
-        }
-      } catch (err) {
-        console.error(err);
-        return done(err);
-      }
-    }
-  )
-);
-
-passport.serializeUser(function (user, done) {
-  done(null, user.id);
-});
-
-passport.deserializeUser(function (아이디, done) {
-  done(null, {});
-});
-
-app.get("/register", (req, res) => {
-  res.render("register.ejs");
-});
-
-app.post("/register", async (req, res) => {
-  try {
-    await db.collection("member").insertOne({
-      id: req.body.id,
-      pw: req.body.pw,
-    });
-  } catch (err) {
-    console.error(err);
-  }
-
-  res.redirect("/");
 });
