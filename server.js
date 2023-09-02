@@ -134,28 +134,23 @@ function loginCheck(req, res, next) {
 }
 
 app.get("/mypage", loginCheck, async (req, res) => {
-  // 세션이 있는지 검사
-  // 세션이 가진 id 정보를 이용해서 해당 유저가 쓴 todo 가져오기
-  // const id = req.user.id;
+  const id = req.user.result.id;
 
   try {
     const myPosts = await db.collection("post").find({ id: id }).toArray();
-    res.render("mypage.ejs", { post: myPosts });
+    res.render("mypage.ejs", { posts: myPosts });
   } catch (err) {
     console.error(err);
   }
 });
 
-// /mypage는 req.user가 인식이 되는데 /write-todo 에서는 req.user가 인식이 안되는 이유가 뭘까..
 app.get("/write-todo", loginCheck, (req, res) => {
-  console.log(id);
-
   res.render("write.ejs");
 });
 
 app.post("/write-todo", loginCheck, async (req, res) => {
-  // const id = req.user.id;
-  // console.log(id);
+  const id = req.user.result.id;
+  console.log(id);
   try {
     total = await db
       .collection("post-counter")
@@ -166,7 +161,7 @@ app.post("/write-todo", loginCheck, async (req, res) => {
       date: req.body.date,
       detail: req.body.detail,
       important: req.body.important ? "Y" : "N",
-      // id: req.user.id,
+      id: req.user.result.id,
     });
     await db
       .collection("post-counter")
