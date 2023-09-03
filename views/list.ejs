@@ -23,9 +23,16 @@
 
     <!-- 만약 이 todo가 중요!일 경우 todo 색을 다른색으로? -->
     <!-- to do:를 누르면 상세 페이지로 가도록 설정?-->
+    <!-- 수정/삭제 버튼이 id == id 인 사람에게만 보여지도록 설정 -->
     <div class="container mt-4">
       <ul class="list-group">
         <h2 class="text-center">To do List</h2>
+
+        <div class="input-group mb-2 mt-4">
+          <input class="form-control" />
+          <button class="input-group-append btn btn-info sm">검색</button>
+        </div>
+
         <% for (let i = 0; i < posts.length; i++) { %>
         <li class="list-group-item">
           <h4>
