@@ -92,3 +92,7 @@ MongoDB의 트랜잭션은 'session'을 통해 작동하며, 트랜잭션 내에
 
 - 띄어쓰기 기준으로 단어를 저장
 - 띄어쓰기 단위로 indexing 대신 글자 두 개 단위로 indexing(nGram)
+
+#### search index
+
+- index Analyzer와 Search Analyzer를 한국어로 설정해서 그런지, 한국어 (2글자 이상)가 아니면 검색이 안 됨.

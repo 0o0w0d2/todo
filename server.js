@@ -189,11 +189,34 @@ app.get("/list", async (req, res) => {
 app.get("/search", async (req, res) => {
   const content = req.query.value;
 
+  const searchCondition = [
+    {
+      $search: {
+        index: "todoSearch",
+        text: {
+          query: req.query.value,
+          path: "todo",
+        },
+      },
+    },
+    {
+      // id를 기준으로 오름차순 정렬(-1 : 내림차순)
+      $sort: { _id: 1 },
+    },
+    // {
+    //   // 상위 몇 개 가져오기
+    //   $limit: 5,
+    // },
+    // {
+    //   // 검색 결과에서 필터주는 법
+    //   // 0 - 안가져옴
+    //   // score -> 검색어와 db의 자료가 얼마나 관련이 있는지 점수 매김(mongodb 자체 기능)
+    //   $project: { todo: 1, _id: 0, score: { $meta: "searchScore" } },
+    // },
+  ];
+
   try {
-    result = await db
-      .collection("post")
-      .find({ $text: { $search: req.query.value } })
-      .toArray();
+    result = await db.collection("post").aggregate(searchCondition).toArray();
     res.render("search.ejs", { posts: result });
   } catch (err) {
     console.error(err);
