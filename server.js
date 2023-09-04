@@ -112,13 +112,23 @@ app.post("/register", async (req, res) => {
   // 아이디 중복 체크?
   // 비밀번호 == 비밀번호 확인?
   // 비밀번호 암호화해서 DB에 저장
+  const id = req.body.id;
+  const pw = req.body.pw;
+
   try {
+    const idCheck = await db.collection("member").findOne({ id: id });
+
+    if (idCheck) {
+      res.status(400).send("이미 존재하는 아이디입니다.");
+      return;
+    }
     await db.collection("member").insertOne({
-      id: req.body.id,
-      pw: req.body.pw,
+      id: id,
+      pw: pw,
     });
   } catch (err) {
     console.error(err);
+    res.status(500).send(err);
   }
 
   res.redirect("/");
@@ -134,7 +144,7 @@ function loginCheck(req, res, next) {
 }
 
 app.get("/mypage", loginCheck, async (req, res) => {
-  const id = req.user.result.id;
+  const id = req.user.result._id;
 
   try {
     const myPosts = await db.collection("post").find({ id: id }).toArray();
@@ -149,8 +159,6 @@ app.get("/write-todo", loginCheck, (req, res) => {
 });
 
 app.post("/write-todo", loginCheck, async (req, res) => {
-  const id = req.user.result.id;
-  console.log(id);
   try {
     total = await db
       .collection("post-counter")
@@ -161,7 +169,7 @@ app.post("/write-todo", loginCheck, async (req, res) => {
       date: req.body.date,
       detail: req.body.detail,
       important: req.body.important ? "Y" : "N",
-      id: req.user.result.id,
+      user: req.user.result._id,
     });
     await db
       .collection("post-counter")
@@ -223,25 +231,34 @@ app.get("/search", async (req, res) => {
   }
 });
 
-app.get("/post/:id", async (req, res) => {
-  const id = parseInt(req.params.id);
+app.get("/post/:postId", async (req, res) => {
+  const postId = parseInt(req.params.postId);
 
   try {
-    const post = await db.collection("post").findOne({ _id: id });
+    const post = await db.collection("post").findOne({ _id: postId });
 
     res.status(200).render("detail.ejs", { post: post });
   } catch (err) {
     console.error(err);
   }
 
-  console.log(`post ${id} successfully loaded`);
+  console.log(`post ${postId} successfully loaded`);
 });
 
-app.delete("/post/:id", async (req, res) => {
-  const id = parseInt(req.body._id);
+app.delete("/post/:postId", async (req, res) => {
+  const postId = parseInt(req.body._id);
+  const currentUser = req.user.result._id;
+  console.log("현재 유저", currentUser);
 
   try {
-    await db.collection("post").deleteOne({ _id: id });
+    const post = await db.collection("post").findOne({ _id: postId });
+
+    if (post.user != currentUser) {
+      res.status(400).send("삭제 권한이 없습니다.");
+      return;
+    }
+
+    await db.collection("post").deleteOne({ _id: postId });
   } catch (err) {
     console.error(err);
     res.status(500);
@@ -251,11 +268,21 @@ app.delete("/post/:id", async (req, res) => {
   res.status(200).send({ message: "Successfully deleted" });
 });
 
-app.get("/post/:id/edit", async (req, res) => {
-  const id = parseInt(req.params.id);
+app.get("/post/:postId/edit", async (req, res) => {
+  const postId = parseInt(req.params.postId);
+  const currentUser = req.user.result._id;
+
+  console.log("현재 유저", currentUser);
 
   try {
-    const post = await db.collection("post").findOne({ _id: id });
+    const post = await db.collection("post").findOne({ _id: postId });
+    console.log("포스트 작성자", post.user);
+    console.log("참인가 거짓인가", post.user == currentUser);
+
+    if (post.user != currentUser) {
+      res.status(400).send("수정 권한이 없습니다.");
+      return;
+    }
 
     res.status(200).render("edit-methodoverride.ejs", { post: post });
   } catch (err) {
@@ -263,11 +290,20 @@ app.get("/post/:id/edit", async (req, res) => {
   }
 });
 
-app.put("/post/:id", async (req, res) => {
-  const id = parseInt(req.params.id);
+app.put("/post/:postId", async (req, res) => {
+  const postId = parseInt(req.params.postId);
+  const currentUser = req.user.result._id;
+
   try {
+    const post = await db.collection("post").findOne({ _id: postId });
+
+    if (post.user != currentUser) {
+      res.status(400).send("수정 권한이 없습니다.");
+      return;
+    }
+
     await db.collection("post").updateOne(
-      { _id: id },
+      { _id: postId },
       {
         $set: {
           todo: req.body.todo,
@@ -281,7 +317,7 @@ app.put("/post/:id", async (req, res) => {
       .status(200)
       // ajax 사용 시 .send({ message: "Successfully updated" })
       // method-override 사용 시
-      .redirect(`/post/${id}`);
+      .redirect(`/post/${postId}`);
   } catch (err) {
     console.error(err);
   }
