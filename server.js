@@ -186,6 +186,20 @@ app.get("/list", async (req, res) => {
   console.log("List successfully loaded");
 });
 
+app.get("/search", async (req, res) => {
+  const content = req.query.value;
+
+  try {
+    result = await db
+      .collection("post")
+      .find({ todo: { $regex: content } })
+      .toArray();
+    res.render("search.ejs", { posts: result });
+  } catch (err) {
+    console.error(err);
+  }
+});
+
 app.get("/post/:id", async (req, res) => {
   const id = parseInt(req.params.id);
 
