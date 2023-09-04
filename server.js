@@ -192,7 +192,7 @@ app.get("/search", async (req, res) => {
   try {
     result = await db
       .collection("post")
-      .find({ todo: { $regex: content } })
+      .find({ $text: { $search: req.query.value } })
       .toArray();
     res.render("search.ejs", { posts: result });
   } catch (err) {
