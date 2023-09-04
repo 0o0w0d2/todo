@@ -248,12 +248,11 @@ app.get("/post/:postId", async (req, res) => {
 app.delete("/post/:postId", async (req, res) => {
   const postId = parseInt(req.body._id);
   const currentUser = req.user.result._id;
-  console.log("현재 유저", currentUser);
 
   try {
     const post = await db.collection("post").findOne({ _id: postId });
 
-    if (post.user != currentUser) {
+    if (!currentUser.equals(post.user)) {
       res.status(400).send("삭제 권한이 없습니다.");
       return;
     }
@@ -272,14 +271,10 @@ app.get("/post/:postId/edit", async (req, res) => {
   const postId = parseInt(req.params.postId);
   const currentUser = req.user.result._id;
 
-  console.log("현재 유저", currentUser);
-
   try {
     const post = await db.collection("post").findOne({ _id: postId });
-    console.log("포스트 작성자", post.user);
-    console.log("참인가 거짓인가", post.user == currentUser);
 
-    if (post.user != currentUser) {
+    if (!currentUser.equals(post.user)) {
       res.status(400).send("수정 권한이 없습니다.");
       return;
     }
@@ -297,7 +292,7 @@ app.put("/post/:postId", async (req, res) => {
   try {
     const post = await db.collection("post").findOne({ _id: postId });
 
-    if (post.user != currentUser) {
+    if (!currentUser.equals(post.user)) {
       res.status(400).send("수정 권한이 없습니다.");
       return;
     }
