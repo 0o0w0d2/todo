@@ -115,6 +115,8 @@ app.post("/register", async (req, res) => {
   const id = req.body.id;
   const pw = req.body.pw;
 
+  // id에 알파벳, 숫자만 들어있나 확인(정규식)
+  // id, pw 자릿 수 제한
   try {
     const idCheck = await db.collection("member").findOne({ id: id });
 
@@ -147,7 +149,7 @@ app.get("/mypage", loginCheck, async (req, res) => {
   const id = req.user.result._id;
 
   try {
-    const myPosts = await db.collection("post").find({ id: id }).toArray();
+    const myPosts = await db.collection("post").find({ user: id }).toArray();
     res.render("mypage.ejs", { posts: myPosts });
   } catch (err) {
     console.error(err);
@@ -160,17 +162,18 @@ app.get("/write-todo", loginCheck, (req, res) => {
 
 app.post("/write-todo", loginCheck, async (req, res) => {
   try {
-    total = await db
+    const total = await db
       .collection("post-counter")
       .findOne({ name: "게시물 갯수" });
-    await db.collection("post").insertOne({
+    const post = {
       _id: total.totalPost + 1,
       todo: req.body.todo,
       date: req.body.date,
       detail: req.body.detail,
       important: req.body.important ? "Y" : "N",
       user: req.user.result._id,
-    });
+    };
+    await db.collection("post").insertOne(post);
     await db
       .collection("post-counter")
       .updateOne({ name: "게시물 갯수" }, { $inc: { totalPost: 1 } });
