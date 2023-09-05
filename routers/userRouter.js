@@ -112,6 +112,7 @@ userRouter.get("/mypage", loginCheck, async (req, res) => {
   const id = req.user.result._id;
 
   try {
+    const db = getDb();
     const myPosts = await db.collection("post").find({ user: id }).toArray();
     res.render("mypage.ejs", { posts: myPosts });
   } catch (err) {

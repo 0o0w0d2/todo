@@ -65,7 +65,7 @@
       $("#search").click(function (e) {
         const searchInput = $("#search-input").val();
         // get 요청과 같은 역할을 함 = 쿼리스트링
-        window.location.replace(`/search?value=${searchInput}`);
+        window.location.replace(`post/search?value=${searchInput}`);
       });
 
       // query string 이용하는 또 다른 방법

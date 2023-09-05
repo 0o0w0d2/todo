@@ -1,7 +1,8 @@
 const postRouter = require("express").Router();
 const methodOverride = require("method-override");
 postRouter.use(methodOverride("_method"));
-const { connectToDatabase, getDb } = require("../db");
+const { getDb } = require("../db");
+
 postRouter.get("/write-todo", (req, res) => {
   res.render("write.ejs");
 });
@@ -45,7 +46,7 @@ postRouter.get("/list", async (req, res) => {
   console.log("List successfully loaded");
 });
 
-postRouter.get("/post/:postId", async (req, res) => {
+postRouter.get("/:postId", async (req, res) => {
   const postId = parseInt(req.params.postId);
 
   try {
@@ -60,7 +61,7 @@ postRouter.get("/post/:postId", async (req, res) => {
   console.log(`post ${postId} successfully loaded`);
 });
 
-postRouter.delete("/post/:postId", async (req, res) => {
+postRouter.delete("/:postId", async (req, res) => {
   const postId = parseInt(req.body._id);
   const currentUser = req.user.result._id;
 
@@ -83,7 +84,7 @@ postRouter.delete("/post/:postId", async (req, res) => {
   res.status(200).send({ message: "Successfully deleted" });
 });
 
-postRouter.get("/post/:postId/edit", async (req, res) => {
+postRouter.get("/:postId/edit", async (req, res) => {
   const postId = parseInt(req.params.postId);
   const currentUser = req.user.result._id;
 
@@ -102,7 +103,7 @@ postRouter.get("/post/:postId/edit", async (req, res) => {
   }
 });
 
-postRouter.put("/post/:postId", async (req, res) => {
+postRouter.put("/:postId", async (req, res) => {
   const postId = parseInt(req.params.postId);
   const currentUser = req.user.result._id;
 
