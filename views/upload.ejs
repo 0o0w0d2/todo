@@ -23,9 +23,17 @@
 
     <div class="container mt-4">
       <h2 class="text-center">image upload</h2>
-
       <form method="POST" action="/image/upload" enctype="multipart/form-data">
-        <input type="file" />
+        <div class="form-group mt-4">
+          <label for="exampleFormControlFile1">사진을 선택해주세요</label>
+          <input
+            type="file"
+            class="form-control-file"
+            id="FormControlFile1"
+            name="profile"
+          />
+          <button type="submit" class="btn btn-info sm mt-4">전송</button>
+        </div>
       </form>
     </div>
 
