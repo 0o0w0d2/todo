@@ -19,17 +19,20 @@
 
     <title>Hello, world!</title>
   </head>
-  <!-- 수정/삭제 버튼이 id == id 인 사람에게만 보여지도록 설정 -->
+
   <body>
     <%- include('nav.html') %>
     <div class="container p-4 detail">
       <div class="row">
         <div class="col-3">
           <ul class="list-group chat-list">
-            <li class="list-group-item" data-id="">
-              <h6>채팅방1</h6>
-              <h6 class="text-small">채팅방설명</h6>
+            <% for (let i = 0; i < rooms.length; i++) { %>
+            <li class="list-group-item">
+              <h6><%= rooms[i].title %></h6>
+              <h6 class="text-small"></h6>
             </li>
+            <% } %>
+
             <li class="list-group-item">
               <h6>채팅방2</h6>
               <h6 class="text-small">채팅방설명</h6>

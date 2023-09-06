@@ -4,8 +4,19 @@ const { getDb } = require("../db");
 
 // const db = getDb();
 
-chatRouter.get("/", (req, res) => {
-  res.render("chat.ejs");
+chatRouter.get("/", async (req, res) => {
+  try {
+    const db = getDb();
+    const id = new ObjectId(req.user.result._id).toString();
+    const rooms = await db
+      .collection("chatroom")
+      .find({ member: id })
+      .toArray();
+    console.log(rooms);
+    res.render("chat.ejs", { rooms: rooms });
+  } catch (err) {
+    console.error(err);
+  }
 });
 
 // 이 유저와 채팅하기 버튼을 누르면
