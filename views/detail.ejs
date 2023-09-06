@@ -45,6 +45,13 @@
             삭제
           </button>
         </div>
+        <button
+          type="submit"
+          class="btn btn-info btn chat"
+          data-id="<%= post.user %>"
+        >
+          이 유저와 채팅하기
+        </button>
       </div>
     </div>
 
@@ -59,6 +66,23 @@
           data: { _id: _id },
           success: function (result) {
             window.location.href = "/list";
+          },
+          error: function (xhr, textStatus, errorThrown) {
+            console.log(xhr, textStatus, errorThrown);
+          },
+        });
+      });
+    </script>
+
+    <script>
+      $(".chat").click(function (e) {
+        const user = e.target.dataset.id;
+        $.ajax({
+          method: "POST",
+          url: "/chat",
+          data: { user: user },
+          success: function (result) {
+            window.location.href = "/chat";
           },
           error: function (xhr, textStatus, errorThrown) {
             console.log(xhr, textStatus, errorThrown);
