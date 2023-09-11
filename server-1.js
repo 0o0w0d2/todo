@@ -26,5 +26,5 @@ app.get("/", (req, res) => {
 
 app.use("/", require("./routers/userRouter.js"));
 app.use("/post", loginCheck, require("./routers/postRouter.js"));
-app.use("/image", require("./routers/imageRouter.js"));
-app.use("/chat", require("./routers/chatRouter.js"));
+app.use("/image", loginCheck, require("./routers/imageRouter.js"));
+app.use("/chat", loginCheck, require("./routers/chatRouter.js"));

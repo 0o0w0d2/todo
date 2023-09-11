@@ -27,16 +27,11 @@
         <div class="col-3">
           <ul class="list-group chat-list">
             <% for (let i = 0; i < rooms.length; i++) { %>
-            <li class="list-group-item">
+            <li class="list-group-item" data-id="<%= rooms[i]._id %>">
               <h6><%= rooms[i].title %></h6>
-              <h6 class="text-small"></h6>
+              <h6 class="text-small"><%= rooms[i].member %></h6>
             </li>
             <% } %>
-
-            <li class="list-group-item">
-              <h6>채팅방2</h6>
-              <h6 class="text-small">채팅방설명</h6>
-            </li>
           </ul>
         </div>
 
@@ -57,6 +52,29 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
+
+    <script>
+      let roomId;
+
+      $(".list-group-item").click(function () {
+        roomId = this.dataset.id;
+      });
+
+      $("#send").click((e) => {
+        const chatInput = $("#chat-input").val();
+        $.ajax({
+          method: "POST",
+          data: {
+            content: chatInput,
+            parent: roomId,
+          },
+          url: "/chat/message",
+          error: function (xhr, textStatus, errorThrown) {
+            console.log(xhr, textStatus, errorThrown);
+          },
+        });
+      });
+    </script>
 
     <script
       src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"

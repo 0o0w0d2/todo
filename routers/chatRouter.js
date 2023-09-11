@@ -7,7 +7,7 @@ const { getDb } = require("../db");
 chatRouter.get("/", async (req, res) => {
   try {
     const db = getDb();
-    const id = new ObjectId(req.user.result._id).toString();
+    const id = req.user.result._id;
     const rooms = await db
       .collection("chatroom")
       .find({ member: id })
@@ -27,15 +27,33 @@ chatRouter.get("/", async (req, res) => {
 chatRouter.post("/", async (req, res) => {
   try {
     const db = getDb();
-    const senderId = new ObjectId(req.user.result._id).toString();
-
-    await db.collection("chatroom").insertOne({
-      member: [senderId, req.body.user],
-      sender: senderId,
-      receiver: req.body.user,
+    const senderId = req.user.result._id;
+    const data = {
+      member: [senderId, new ObjectId(req.body.user)],
       date: new Date(),
-      title: "뭐로 하지",
-    });
+      title: "ㅎㅇㅎㅇ",
+    };
+    await db.collection("chatroom").insertOne(data);
+  } catch (err) {
+    console.error(err);
+  }
+});
+
+chatRouter.post("/message", async (req, res) => {
+  try {
+    const db = getDb();
+    console.log("보낸 내용", req.body);
+    console.log("보낸 사람", req.user.result._id);
+
+    const message = {
+      sender: req.user.result._id,
+      content: req.body.content,
+      roomId: req.body.parent,
+      date: new Date(),
+    };
+
+    const 보낸거 = await db.collection("message").insertOne(message);
+    console.log(보낸거);
   } catch (err) {
     console.error(err);
   }
