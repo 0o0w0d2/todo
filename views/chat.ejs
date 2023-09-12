@@ -54,10 +54,19 @@
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
 
     <script>
-      let roomId;
+      // senderId == user와 같으면 오른쪽에 출력
+      // 그렇지 않으면 왼쪽에 출력
+      // 시간 순서대로 출력
 
+      let roomId;
+      let eventSource;
       $(".list-group-item").click(function () {
         roomId = this.dataset.id;
+
+        eventSource = new EventSource("/chat/message/" + roomId);
+        eventSource.addEventListener("test", function (e) {
+          console.log(JSON.parse(e.data));
+        });
       });
 
       $("#send").click((e) => {

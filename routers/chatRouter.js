@@ -42,8 +42,6 @@ chatRouter.post("/", async (req, res) => {
 chatRouter.post("/message", async (req, res) => {
   try {
     const db = getDb();
-    console.log("보낸 내용", req.body);
-    console.log("보낸 사람", req.user.result._id);
 
     const message = {
       sender: req.user.result._id,
@@ -52,8 +50,33 @@ chatRouter.post("/message", async (req, res) => {
       date: new Date(),
     };
 
-    const 보낸거 = await db.collection("message").insertOne(message);
-    console.log(보낸거);
+    console.log("보낸 메시지", message);
+
+    await db.collection("message").insertOne(message);
+  } catch (err) {
+    console.error(err);
+  }
+});
+
+chatRouter.get("/message/:roomId", async (req, res) => {
+  try {
+    const db = getDb();
+    const roomId = req.params.roomId;
+    res.writeHead(200, {
+      Connection: "keep-alive",
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache",
+    });
+
+    console.log("이거", roomId);
+
+    const chatting = await db
+      .collection("message")
+      .find({ roomId: roomId })
+      .toArray();
+
+    res.write("event: test\n");
+    res.write(`data: ${JSON.stringify(chatting)}\n\n`);
   } catch (err) {
     console.error(err);
   }
