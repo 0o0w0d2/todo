@@ -62,10 +62,22 @@
       let eventSource;
       $(".list-group-item").click(function () {
         roomId = this.dataset.id;
+        $(".chat-content").html("");
+
+        if (eventSource != undefined) {
+          eventSource.close();
+        }
 
         eventSource = new EventSource("/chat/message/" + roomId);
         eventSource.addEventListener("test", function (e) {
           console.log(JSON.parse(e.data));
+
+          let chatting = JSON.parse(e.data);
+          chatting.forEach((i) => {
+            $(".chat-content").append(
+              `<li><span class='chat-box'>${i.content}</span></li>`
+            );
+          });
         });
       });
 

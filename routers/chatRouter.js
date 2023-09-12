@@ -77,6 +77,16 @@ chatRouter.get("/message/:roomId", async (req, res) => {
 
     res.write("event: test\n");
     res.write(`data: ${JSON.stringify(chatting)}\n\n`);
+
+    const pipeline = [{ $match: { "fullDocument.roomId": roomId } }];
+
+    const collection = db.collection("message");
+    const changeStream = collection.watch(pipeline);
+    changeStream.on("change", (result) => {
+      console.log(result.fullDocument);
+      res.write("event: test\n");
+      res.write(`data: ${JSON.stringify([result.fullDocument])}\n\n`);
+    });
   } catch (err) {
     console.error(err);
   }
